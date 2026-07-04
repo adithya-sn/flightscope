@@ -1,0 +1,21 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "flightscope"
+version = "0.1.0"
+requires-python = ">=3.11"
+dependencies = [
+    "requests",
+    "pillow",
+]
+
+[project.optional-dependencies]
+oled = ["luma.oled"]
+
+[dependency-groups]
+dev = ["pygame"]
+
+[project.scripts]
+flightscope = "flightscope.app:main"

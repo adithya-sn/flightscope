@@ -1,0 +1,23 @@
+[source]
+url = "http://10.0.0.245/dump1090/data/aircraft.json"
+poll_interval = 1.0
+
+[observer]
+lat = 13.0827
+lon = 77.5877
+range_km = 30.0
+
+[display]
+backend = "pygame"   # change to "oled" on Pi
+fps = 15
+rotate_every = 5.0
+
+[oled]
+radar_dc = 24
+radar_rst = 25
+radar_spi_port = 0
+radar_spi_device = 0
+info_dc = 23
+info_rst = 22
+info_spi_port = 0
+info_spi_device = 1
