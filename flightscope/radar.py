@@ -63,12 +63,13 @@ def draw_radar(
     # 3. North label
     canvas.text((cx - 4, cy - radius_px - 14), "N", font=_font_small, fill=fg)
 
-    # 4. Non-selected aircraft
+    # 4. Non-selected aircraft — colour by altitude
     for ac in aircraft:
         if selected is not None and ac.icao == selected.icao:
             continue
         x, y = project_to_pixel(ac.bearing_deg, ac.distance_km, range_km, cx, cy, radius_px)
-        canvas.ellipse((x - dot_r, y - dot_r, x + dot_r, y + dot_r), fill=fg)
+        dot_color = _altitude_color(ac.altitude, fg)
+        canvas.ellipse((x - dot_r, y - dot_r, x + dot_r, y + dot_r), fill=dot_color)
 
     # 5. Selected aircraft (drawn last, on top)
     if selected is not None:
@@ -83,6 +84,24 @@ def draw_radar(
                 [(x, y - tri_r), (x + tri_r, y), (x, y + tri_r), (x - tri_r, y)],
                 fill=accent,
             )
+
+
+def _altitude_color(
+    altitude: int | None,
+    fg: int | tuple[int, int, int],
+) -> int | tuple[int, int, int]:
+    """Map altitude (ft) to a dot colour. Falls back to fg for 1-bit displays."""
+    if not isinstance(fg, tuple):
+        return fg
+    if altitude is None:
+        return (120, 120, 120)   # unknown — grey
+    if altitude < 1_000:
+        return (180, 40, 40)     # ground / low — red
+    if altitude < 10_000:
+        return (220, 200, 0)     # low-mid — yellow
+    if altitude < 25_000:
+        return (0, 220, 60)      # mid — green (same as fg)
+    return (0, 200, 220)         # high — cyan
 
 
 def _triangle(
