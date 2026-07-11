@@ -47,13 +47,18 @@ def draw_radar(
     dot_r = 3                           # non-selected dot radius (fixed small)
     tri_r = max(5, radius_px // 10)    # selected triangle half-size
 
-    # 1. Range rings
+    # 1. Outer boundary circle + inner range rings
+    canvas.ellipse(
+        (cx - radius_px, cy - radius_px, cx + radius_px, cy + radius_px),
+        outline=fg, width=ring_w,
+    )
     for ring_km in RING_KM:
         ring_px = int((ring_km / range_km) * radius_px)
+        if ring_px >= radius_px:
+            continue
         canvas.ellipse(
             (cx - ring_px, cy - ring_px, cx + ring_px, cy + ring_px),
-            outline=dim,
-            width=ring_w,
+            outline=dim, width=ring_w,
         )
 
     # 2. Compass cross (dimmed)
