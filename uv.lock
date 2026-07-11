@@ -158,6 +158,9 @@ dependencies = [
 ]
 
 [package.optional-dependencies]
+dev = [
+    { name = "pygame" },
+]
 oled = [
     { name = "luma-oled" },
 ]
@@ -167,7 +170,7 @@ tft = [
 
 [package.dev-dependencies]
 dev = [
-    { name = "pygame" },
+    { name = "flightscope", extra = ["dev"] },
 ]
 
 [package.metadata]
@@ -175,12 +178,13 @@ requires-dist = [
     { name = "luma-lcd", marker = "extra == 'tft'" },
     { name = "luma-oled", marker = "extra == 'oled'" },
     { name = "pillow" },
+    { name = "pygame", marker = "extra == 'dev'" },
     { name = "requests" },
 ]
-provides-extras = ["oled", "tft"]
+provides-extras = ["oled", "tft", "dev"]
 
 [package.metadata.requires-dev]
-dev = [{ name = "pygame" }]
+dev = [{ name = "flightscope", extras = ["dev"] }]
 
 [[package]]
 name = "idna"

@@ -14,9 +14,10 @@ dependencies = [
 [project.optional-dependencies]
 oled = ["luma.oled"]
 tft  = ["luma.lcd"]
+dev  = ["pygame"]
 
 [dependency-groups]
-dev = ["pygame"]
+dev = ["flightscope[dev]"]
 
 [project.scripts]
 flightscope = "flightscope.app:main"
