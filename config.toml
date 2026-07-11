@@ -13,8 +13,8 @@ fps = 15
 rotate_every = 5.0
 
 [tft]
-dc = 24
-rst = 25
+dc = 25
+rst = 24
 spi_port = 0
 spi_device = 0
 width = 480
