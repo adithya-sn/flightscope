@@ -44,9 +44,8 @@ def draw_radar(
 
     # Ring line width scales with panel size
     ring_w = max(1, radius_px // 30)
-    vec_len = max(8, radius_px // 4)   # heading vector length
     dot_r = max(1, radius_px // 20)    # non-selected dot radius
-    sel_r = max(3, radius_px // 10)    # selected circle radius
+    tri_r = max(5, radius_px // 8)     # selected triangle half-size
 
     # 1. Range rings
     for ring_km in RING_KM:
@@ -76,12 +75,30 @@ def draw_radar(
         x, y = project_to_pixel(
             selected.bearing_deg, selected.distance_km, range_km, cx, cy, radius_px
         )
-        canvas.ellipse((x - sel_r, y - sel_r, x + sel_r, y + sel_r), outline=accent, width=ring_w)
         if selected.track is not None:
-            theta = math.radians(selected.track)
-            hx = x + vec_len * math.sin(theta)
-            hy = y - vec_len * math.cos(theta)
-            canvas.line((x, y, int(hx), int(hy)), fill=accent, width=ring_w)
+            canvas.polygon(_triangle(x, y, tri_r, selected.track), fill=accent)
+        else:
+            # Diamond when track unknown
+            canvas.polygon(
+                [(x, y - tri_r), (x + tri_r, y), (x, y + tri_r), (x - tri_r, y)],
+                fill=accent,
+            )
+
+
+def _triangle(
+    cx: int, cy: int, r: int, track_deg: float
+) -> list[tuple[int, int]]:
+    """
+    Return three vertices of a filled triangle centred at (cx, cy),
+    pointing in track_deg direction (0 = north-up), with tip-to-centre = r.
+    """
+    # tip points in direction of travel; base is opposite
+    tip   = math.radians(track_deg)
+    left  = math.radians(track_deg + 140)
+    right = math.radians(track_deg - 140)
+    def pt(angle: float, length: float) -> tuple[int, int]:
+        return (int(cx + length * math.sin(angle)), int(cy - length * math.cos(angle)))
+    return [pt(tip, r), pt(left, r * 0.65), pt(right, r * 0.65)]
 
 
 def _dim_color(color: int | tuple[int, int, int]) -> int | tuple[int, int, int]:

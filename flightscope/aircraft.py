@@ -32,7 +32,7 @@ class Aircraft:
         return f"{int(self.speed)} kt"
 
     def vrate_symbol(self) -> str:
-        """'↑' climbing, '↓' descending, '→' level or unknown."""
+        """'^' climbing, 'v' descending, '-' level or unknown."""
         if self.vertical_rate is None or abs(self.vertical_rate) < 64:
-            return "\u2192"
-        return "\u2191" if self.vertical_rate > 0 else "\u2193"
+            return "-"
+        return "^" if self.vertical_rate > 0 else "v"
