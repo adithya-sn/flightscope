@@ -56,12 +56,11 @@ def draw_info(
 
     # --- Callsign ---
     cs = aircraft.display_callsign()
-    cs_bb = canvas.textbbox((0, 0), cs, font=_font_cs)
-    cs_h = cs_bb[3] - cs_bb[1]
+    cs_bb = canvas.textbbox((2, 2), cs, font=_font_cs)
     canvas.text((2, 2), cs, font=_font_cs, fill=fg)
 
-    # Separator
-    sep_y = cs_h + 8
+    # Separator below actual rendered bottom of callsign
+    sep_y = cs_bb[3] + 4
     canvas.line((0, sep_y, w - 1, sep_y), fill=fg)
 
     # --- Two-column data rows ---
