@@ -44,8 +44,8 @@ def draw_radar(
 
     # Ring line width scales with panel size
     ring_w = max(1, radius_px // 30)
-    dot_r = max(1, radius_px // 20)    # non-selected dot radius
-    tri_r = max(5, radius_px // 8)     # selected triangle half-size
+    dot_r = 3                           # non-selected dot radius (fixed small)
+    tri_r = max(5, radius_px // 10)    # selected triangle half-size
 
     # 1. Range rings
     for ring_km in RING_KM:
@@ -63,16 +63,21 @@ def draw_radar(
     # 3. North label
     canvas.text((cx - 4, cy - radius_px - 14), "N", font=_font_small, fill=fg)
 
-    # 4. Non-selected aircraft — colour by altitude
+    # 4. Non-selected aircraft — colour by altitude, skip if out of range
     for ac in aircraft:
         if selected is not None and ac.icao == selected.icao:
             continue
+        if ac.distance_km >= range_km:
+            continue
         x, y = project_to_pixel(ac.bearing_deg, ac.distance_km, range_km, cx, cy, radius_px)
+        # Skip if dot would bleed outside the radar circle
+        if math.hypot(x - cx, y - cy) > radius_px - dot_r:
+            continue
         dot_color = _altitude_color(ac.altitude, fg)
         canvas.ellipse((x - dot_r, y - dot_r, x + dot_r, y + dot_r), fill=dot_color)
 
-    # 5. Selected aircraft (drawn last, on top)
-    if selected is not None:
+    # 5. Selected aircraft (drawn last, on top), skip if out of range
+    if selected is not None and selected.distance_km <= range_km:
         x, y = project_to_pixel(
             selected.bearing_deg, selected.distance_km, range_km, cx, cy, radius_px
         )
