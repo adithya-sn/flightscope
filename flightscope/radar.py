@@ -9,7 +9,7 @@ from .config import AppConfig
 from .display import DisplayBackend
 from .geometry import project_to_pixel
 
-RING_KM: tuple[int, ...] = (10, 20, 30)
+RING_KM: tuple[int, ...] = (50, 100, 150, 200)
 
 _font_small = ImageFont.load_default()
 

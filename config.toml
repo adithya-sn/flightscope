@@ -5,7 +5,7 @@ poll_interval = 1.0
 [observer]
 lat = 13.0827
 lon = 77.5877
-range_km = 30.0
+range_km = 250.0
 
 [display]
 backend = "pygame"   # "tft" on Pi, "oled" for dual-OLED, "pygame" for dev

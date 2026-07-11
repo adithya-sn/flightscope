@@ -10,12 +10,12 @@ from .geometry import haversine
 
 # Synthetic flights: (icao, callsign, bearing_from_obs_deg, distance_km, altitude_ft, speed_kt, track_deg, vrate_fpm)
 _FLEET: list[tuple[str, str, float, float, int, float, float, int]] = [
-    ("4b1a01", "AIQ101",  30.0,  8.0, 32000, 480, 210, 0),
-    ("4b1a02", "IGO202",  80.0, 15.0, 28000, 420, 270,  -512),
-    ("4b1a03", "SEJ303", 150.0, 22.0, 35000, 510, 350,  0),
-    ("4b1a04", "AIC404", 220.0,  5.0,  5000, 180,  60, 1024),
-    ("4b1a05", "VTI505", 300.0, 18.0, 41000, 540, 130,  0),
-    ("4b1a06", "IND606", 340.0, 27.0,  8000, 240, 200, -256),
+    ("4b1a01", "AIQ101",  30.0,  25.0, 32000, 480, 210,    0),
+    ("4b1a02", "IGO202",  80.0,  50.0, 28000, 420, 270, -512),
+    ("4b1a03", "SEJ303", 150.0,  90.0, 35000, 510, 350,    0),
+    ("4b1a04", "AIC404", 220.0,  15.0,  5000, 180,  60, 1024),
+    ("4b1a05", "VTI505", 300.0, 130.0, 41000, 540, 130,    0),
+    ("4b1a06", "IND606", 340.0, 180.0,  8000, 240, 200, -256),
 ]
 
 # Speed at which each aircraft moves (km/s along its track) for animation
