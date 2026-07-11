@@ -38,16 +38,40 @@ class OledConfig:
 
 
 @dataclass(frozen=True)
+class MetarConfig:
+    station: str
+    enabled: bool
+
+
+@dataclass(frozen=True)
+class TftConfig:
+    dc: int
+    rst: int
+    spi_port: int
+    spi_device: int
+    width: int   # physical pixels (480 for ILI9488 landscape)
+    height: int  # physical pixels (320 for ILI9488 landscape)
+
+
+@dataclass(frozen=True)
 class AppConfig:
     source: SourceConfig
     observer: ObserverConfig
     display: DisplayConfig
     oled: OledConfig
+    tft: TftConfig
+    metar: MetarConfig
 
 
 _DEFAULT_OLED = OledConfig(
     radar_dc=0, radar_rst=0, radar_spi_port=0, radar_spi_device=0,
     info_dc=0,  info_rst=0,  info_spi_port=0,  info_spi_device=0,
+)
+
+_DEFAULT_METAR = MetarConfig(station="VOBL", enabled=True)
+
+_DEFAULT_TFT = TftConfig(
+    dc=0, rst=0, spi_port=0, spi_device=0, width=480, height=320,
 )
 
 
@@ -68,8 +92,8 @@ def load_config(path: str | Path = "config.toml") -> AppConfig:
         raise ValueError(f"observer.range_km must be > 0, got {range_km}")
 
     backend = str(dsp["backend"])
-    if backend not in {"oled", "pygame"}:
-        raise ValueError(f"display.backend must be 'oled' or 'pygame', got {backend!r}")
+    if backend not in {"oled", "tft", "pygame"}:
+        raise ValueError(f"display.backend must be 'oled', 'tft', or 'pygame', got {backend!r}")
 
     if "oled" in raw:
         o = raw["oled"]
@@ -85,6 +109,28 @@ def load_config(path: str | Path = "config.toml") -> AppConfig:
         )
     else:
         oled_cfg = _DEFAULT_OLED
+
+    if "tft" in raw:
+        t = raw["tft"]
+        tft_cfg = TftConfig(
+            dc=int(t["dc"]),
+            rst=int(t["rst"]),
+            spi_port=int(t["spi_port"]),
+            spi_device=int(t["spi_device"]),
+            width=int(t.get("width", 480)),
+            height=int(t.get("height", 320)),
+        )
+    else:
+        tft_cfg = _DEFAULT_TFT
+
+    if "metar" in raw:
+        m = raw["metar"]
+        metar_cfg = MetarConfig(
+            station=str(m.get("station", "VOBL")).upper(),
+            enabled=bool(m.get("enabled", True)),
+        )
+    else:
+        metar_cfg = _DEFAULT_METAR
 
     return AppConfig(
         source=SourceConfig(
@@ -102,4 +148,6 @@ def load_config(path: str | Path = "config.toml") -> AppConfig:
             rotate_every=float(dsp["rotate_every"]),
         ),
         oled=oled_cfg,
+        tft=tft_cfg,
+        metar=metar_cfg,
     )

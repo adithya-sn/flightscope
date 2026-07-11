@@ -13,6 +13,7 @@ dependencies = [
 
 [project.optional-dependencies]
 oled = ["luma.oled"]
+tft  = ["luma.lcd"]
 
 [dependency-groups]
 dev = ["pygame"]

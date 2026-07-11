@@ -9,6 +9,12 @@ from .display import DisplayBackend
 class OledBackend(DisplayBackend):
     """luma.oled SSD1306 backend for the physical Raspberry Pi hardware."""
 
+    PANEL_WIDTH = 128
+    PANEL_HEIGHT = 64
+    IMAGE_MODE = "1"
+    COLOR_FG = 1
+    COLOR_ACCENT = 1
+
     def __init__(self, config: AppConfig) -> None:
         # Deferred imports — luma.oled only available on Pi
         from luma.core.interface.serial import spi

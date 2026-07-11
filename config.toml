@@ -8,9 +8,21 @@ lon = 77.5877
 range_km = 30.0
 
 [display]
-backend = "pygame"   # change to "oled" on Pi
+backend = "pygame"   # "tft" on Pi, "oled" for dual-OLED, "pygame" for dev
 fps = 15
 rotate_every = 5.0
+
+[tft]
+dc = 24
+rst = 25
+spi_port = 0
+spi_device = 0
+width = 480
+height = 320
+
+[metar]
+station = "VOBL"
+enabled = true
 
 [oled]
 radar_dc = 24

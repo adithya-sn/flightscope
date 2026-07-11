@@ -9,6 +9,7 @@ from PIL import ImageDraw
 from .config import load_config
 from .datasource import Dump1090Client
 from .display import DisplayBackend
+from .metar_client import MetarClient
 from .mock_datasource import MockDatasource
 from .info import draw_info
 from .radar import draw_radar
@@ -19,9 +20,12 @@ def _make_backend(config) -> DisplayBackend:
     if config.display.backend == "oled":
         from .oled_backend import OledBackend
         return OledBackend(config)
+    elif config.display.backend == "tft":
+        from .tft_backend import TftBackend
+        return TftBackend(config)
     elif config.display.backend == "pygame":
         from .pygame_backend import PygameBackend
-        return PygameBackend()
+        return PygameBackend(config)
     else:
         print(f"[app] unknown backend: {config.display.backend!r}", file=sys.stderr)
         sys.exit(1)
@@ -54,13 +58,15 @@ def main() -> None:
     backend = _make_backend(config)
     client = MockDatasource(config) if args.mock else Dump1090Client(config)
     tracker = Tracker(config)
+    metar_client = MetarClient(config.metar.station) if config.metar.enabled else None
 
-    frame_interval = 1.0 / config.display.fps   # e.g. 1/15 ≈ 0.0667 s
-    poll_interval = config.source.poll_interval  # e.g. 1.0 s
+    frame_interval = 1.0 / config.display.fps
+    poll_interval = config.source.poll_interval
     last_poll: float = 0.0
 
     print(
         f"[app] starting — backend={config.display.backend} "
+        f"panel={backend.PANEL_WIDTH}×{backend.PANEL_HEIGHT} "
         f"fps={config.display.fps} poll={poll_interval}s"
         + (" [MOCK]" if args.mock else ""),
         file=sys.stderr,
@@ -70,31 +76,26 @@ def main() -> None:
         while True:
             loop_start = time.monotonic()
 
-            # Poll datasource at configured interval (decoupled from render rate)
             now = time.monotonic()
             if now - last_poll >= poll_interval:
                 fetch_start = time.monotonic()
                 aircraft = client.fetch()
                 fetch_elapsed = time.monotonic() - fetch_start
                 if fetch_elapsed > 0.5:
-                    print(
-                        f"[app] slow fetch: {fetch_elapsed:.2f}s",
-                        file=sys.stderr,
-                    )
+                    print(f"[app] slow fetch: {fetch_elapsed:.2f}s", file=sys.stderr)
                 tracker.update(aircraft)
                 last_poll = now
 
-            # Render frame
             radar_img, info_img = backend.new_canvas()
-            draw_radar(ImageDraw.Draw(radar_img), tracker.aircraft, tracker.selected, config)
-            draw_info(info_img, tracker.selected, tracker.mode)
+            draw_radar(ImageDraw.Draw(radar_img), tracker.aircraft, tracker.selected, config, backend)
+            metar = metar_client.latest if metar_client else None
+            draw_info(info_img, tracker.selected, tracker.mode, backend, metar)
 
             try:
                 backend.show(radar_img, info_img)
             except Exception as exc:
                 print(f"[app] display error: {exc}", file=sys.stderr)
 
-            # Sleep to hit target frame rate
             elapsed = time.monotonic() - loop_start
             sleep_time = frame_interval - elapsed
             if sleep_time > 0:
