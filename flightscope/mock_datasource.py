@@ -70,14 +70,10 @@ class MockDatasource:
         for s in self._state:
             icao, callsign, bear_deg, dist_km, alt, spd, trk, vr = s
 
-            # Animate: move each aircraft along its track
-            lat, lon = _offset_position(self._obs_lat, self._obs_lon, bear_deg, dist_km)
-            trk_rad = math.radians(trk)
-            move_km = _ANIM_SPEED_KM_S * elapsed % self._range_km
-            new_lat = lat + math.degrees(math.sin(trk_rad) * move_km / 6371.0)
-            new_lon = lon + math.degrees(
-                math.cos(trk_rad) * move_km / (6371.0 * math.cos(math.radians(lat)))
-            )
+            # Animate: displace initial position along track direction, wrapping in range
+            move_km = (_ANIM_SPEED_KM_S * elapsed) % (self._range_km * 2)
+            lat0, lon0 = _offset_position(self._obs_lat, self._obs_lon, bear_deg, dist_km)
+            new_lat, new_lon = _offset_position(lat0, lon0, trk, move_km)
 
             a = Aircraft(
                 icao=icao,

@@ -70,8 +70,7 @@ def draw_radar(
         if ac.distance_km >= range_km:
             continue
         x, y = project_to_pixel(ac.bearing_deg, ac.distance_km, range_km, cx, cy, radius_px)
-        # Skip if dot would bleed outside the radar circle
-        if math.hypot(x - cx, y - cy) > radius_px - dot_r:
+        if math.hypot(x - cx, y - cy) > radius_px:
             continue
         dot_color = _altitude_color(ac.altitude, fg)
         canvas.ellipse((x - dot_r, y - dot_r, x + dot_r, y + dot_r), fill=dot_color)
